@@ -20,7 +20,8 @@ describe("Book inventory", function() {
         title: "JavaScript in Action",
         authors: ["James Smith", "Kate Donovan"],
         isbn: "0123456789",
-        description: "The ultimate JS book!"
+        description: "The ultimate JS book!",
+        slug: "javascript-in-action"
       });
   });
 });
