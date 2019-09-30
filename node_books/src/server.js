@@ -11,10 +11,18 @@ function auth(req, res, next){
   next();
 }
 
+app.use(express.json());
 app.use(middleware);
+app.use(auth);
 
 app.get("/", function (req, res) {
   res.send("Hello World!");
+});
+
+app.post("/book", function(req, res) {
+  // destructuring from ES6
+  const {title, authors, isbn, description} = req.body;
+  res.json({title, authors, isbn, description});
 });
 
 app.use(function clientError(req, res, next) {
