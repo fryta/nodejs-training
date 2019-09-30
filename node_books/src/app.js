@@ -24,32 +24,33 @@ app.get("/", function (req, res) {
   res.send("Hello World!");
 });
 
-app.post("/book", function(req, res, next) {
-  const {title, authors, isbn, description} = req.body;
-  booksPromise
-    .then(function(books){
-      return books.updateOne(
-        {isbn: isbn},
-        { $set: {title, authors, isbn, description} },
-        {upsert: true}
-      );
-    })
-    .then(function(){
-      return res.json({title, authors, isbn, description});
-    })
-    .catch(next);
+app.post("/book", async function(req, res, next) {
+  try{
+    const {title, authors, isbn, description} = req.body;
+    const books = await booksPromise;
+
+    await books.updateOne(
+      {isbn: isbn},
+      { $set: {title, authors, isbn, description} },
+      {upsert: true}
+    );
+
+    return res.json({title, authors, isbn, description});
+  } catch (e) {
+    next(e);
+  }
 });
 
-app.get("/book/:isbn", function (req, res, next) {
-  const isbn = req.params.isbn;
-  booksPromise
-    .then(function(books){
-      return books.findOne({isbn}, {projection: {_id: false}});
-    })
-    .then(function(err, book){
-      return res.json(book);
-    })
-    .catch(next);
+app.get("/book/:isbn", async function (req, res, next) {
+  try{
+    const isbn = req.params.isbn;
+    const books = await booksPromise;
+    await books.findOne({isbn}, {projection: {_id: false}});
+
+    return res.json(book);
+  } catch (e) {
+    next(e);
+  }
 });
 
 app.use(function clientError(req, res, next) {
