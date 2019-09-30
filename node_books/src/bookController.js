@@ -19,7 +19,18 @@ module.exports = {
 
       const book = await bookRepository.find({isbn});
 
-      return res.json(book);
+      return book ? res.json(book) : next();
+    } catch (e) {
+      next(e);
+    }
+  },
+  async remove(req, res, next){
+    try{
+      const isbn = req.params.isbn;
+
+      await bookRepository.remove({isbn});
+
+      return res.status(204).end();
     } catch (e) {
       next(e);
     }

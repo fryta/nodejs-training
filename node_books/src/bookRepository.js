@@ -17,6 +17,12 @@ module.exports = {
   },
   async find({isbn}) {
     const books = await booksPromise;
+
     return await books.findOne({isbn}, {projection: {_id: false}});
+  },
+  async remove({isbn}) {
+    const books = await booksPromise;
+
+    return await books.deleteOne({isbn});
   }
 }
