@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const controller = require("./bookController");
+const {details, createOrUpdate} = require("./bookController");
+const validateBookMiddleware = require("./validateBookMiddleware");
 
-router.post("/book", controller.createOrUpdate);
-router.get("/book/:isbn", controller.details);
+router.post("/book", validateBookMiddleware, createOrUpdate);
+router.get("/book/:isbn", details);
 
 module.exports = router;
