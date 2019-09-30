@@ -41,7 +41,7 @@ app.post("/book", function(req, res) {
 app.get("/book/:isbn", function (req, res) {
   const isbn = req.params.isbn;
   MongoClient.connect(url, function(err, client) {
-    client.db().collection("books").findOne({isbn}, function(err, book) {
+    client.db().collection("books").findOne({isbn}, {projection: {_id: false}}, function(err, book) {
       res.json(book);
     });
 
