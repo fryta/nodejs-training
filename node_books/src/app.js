@@ -4,10 +4,8 @@ const app = express();
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017/booksapi';
 
-let books;
-
-MongoClient.connect(url, function(err, client) {
-  books = client.db().collection("books");
+let booksPromise = MongoClient.connect(url).then(function(client){
+  return client.db().collection("books");
 });
 
 function middleware(req, res, next){
@@ -26,22 +24,32 @@ app.get("/", function (req, res) {
   res.send("Hello World!");
 });
 
-app.post("/book", function(req, res) {
+app.post("/book", function(req, res, next) {
   const {title, authors, isbn, description} = req.body;
-  books.updateOne(
-    {isbn: isbn},
-    { $set: {title, authors, isbn, description} },
-    {upsert: true}
-  );
-
-  res.json({title, authors, isbn, description});
+  booksPromise
+    .then(function(books){
+      return books.updateOne(
+        {isbn: isbn},
+        { $set: {title, authors, isbn, description} },
+        {upsert: true}
+      );
+    })
+    .then(function(){
+      return res.json({title, authors, isbn, description});
+    })
+    .catch(next);
 });
 
-app.get("/book/:isbn", function (req, res) {
+app.get("/book/:isbn", function (req, res, next) {
   const isbn = req.params.isbn;
-  books.findOne({isbn}, {projection: {_id: false}}, function(err, book) {
-    res.json(book);
-  });
+  booksPromise
+    .then(function(books){
+      return books.findOne({isbn}, {projection: {_id: false}});
+    })
+    .then(function(err, book){
+      return res.json(book);
+    })
+    .catch(next);
 });
 
 app.use(function clientError(req, res, next) {
