@@ -1,7 +1,7 @@
 const eventTypes = require("./eventTypes");
 
 module.exports = function cardModule(now) {
-  return function card(cardIdentifier) {
+  function card(cardIdentifier) {
     let limit = null;
     let cash = 0;
     let events = [];
@@ -45,7 +45,28 @@ module.exports = function cardModule(now) {
       },
       uuid(){
         return cardIdentifier;
+      },
+      apply(event) {
+
+        if (event.type === eventTypes.LIMIT_ASSIGNED) {
+          limit = event.amount;
+        }
+        if (event.type === eventTypes.CARD_WITHDRAWN) {
+          cash -= event.amount;
+        }
+        if (event.type === eventTypes.CARD_REPAID) {
+          cash += event.amount;
+        }
       }
     };
-  };
+  }
+
+  function recreateFrom(cardIdentifier, events){
+    return events.reduce((card, event) => {
+      card.apply(event);
+      return card;
+    }, card(cardIdentifier));
+  }
+
+  return {card, recreateFrom};
 }
