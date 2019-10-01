@@ -1,4 +1,5 @@
-const eventTypes = require("./eventTypes");
+const eventCreatorFactory = require("./eventCreator");
+const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
 
 module.exports = function cardModule(now) {
   function card(cardIdentifier) {
@@ -6,22 +7,23 @@ module.exports = function cardModule(now) {
     let cash = 0;
     let events = [];
 
+    const eventCreator = eventCreatorFactory(cardIdentifier, now);
     const apply = (event) => {
-      if (event.type === eventTypes.LIMIT_ASSIGNED) {
+      if (event.type === LIMIT_ASSIGNED) {
         limit = event.amount;
         cash = event.amount;
       }
-      if (event.type === eventTypes.CARD_WITHDRAWN) {
+      if (event.type === CARD_WITHDRAWN) {
         cash -= event.amount;
       }
-      if (event.type === eventTypes.CARD_REPAID) {
+      if (event.type === CARD_REPAID) {
         cash += event.amount;
       }
     };
     const limitAlreadyAssigned = () => limit !== null;
     const notEnoughMoney = (amount) => cash < amount;
-    const storeAndApplyEvent = (type, amount) => {
-      const event = {type, amount, card_id: cardIdentifier, date: now().toJSON()};
+    const storeAndApplyEvent = (specificEventCreator, amount) => {
+      const event = specificEventCreator(amount);
       apply(event);
       events.push(event);
     };
@@ -32,7 +34,7 @@ module.exports = function cardModule(now) {
           throw new Error("Cannot assign limit for the second time");
         }
 
-        storeAndApplyEvent(eventTypes.LIMIT_ASSIGNED, amount);
+        storeAndApplyEvent(eventCreator.limitAssigned, amount);
       },
       availableLimit() {
         return cash;
@@ -46,10 +48,10 @@ module.exports = function cardModule(now) {
           throw new Error("Not enough money");
         }
 
-        storeAndApplyEvent(eventTypes.CARD_WITHDRAWN, amount);
+        storeAndApplyEvent(eventCreator.cardWithdrawn, amount);
       },
       repay(amount) {
-        storeAndApplyEvent(eventTypes.CARD_REPAID, amount);
+        storeAndApplyEvent(eventCreator.cardRepaid, amount);
       },
       pendingEvents(){
         return events;

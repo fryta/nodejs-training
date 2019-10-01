@@ -1,7 +1,7 @@
 const test = require('tape');
 function now() { return new Date('August 19, 2018 23:15:30 UTC'); }
 const {card, recreateFrom} = require('../src/card')(now);
-const eventTypes = require("../src/eventTypes");
+const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("../src/eventTypes");
 
 test("cannot assign limit for the second time", function (t) {
   const c = card();
@@ -71,9 +71,9 @@ test("can capture events", function (t) {
   c.repay(50000);
 
   t.deepEqual(c.pendingEvents(), [
-    {type: eventTypes.LIMIT_ASSIGNED, amount: 150000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
-    {type: eventTypes.CARD_WITHDRAWN, amount: 100000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
-    {type: eventTypes.CARD_REPAID, amount: 50000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'}
+    {type: LIMIT_ASSIGNED, amount: 150000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: CARD_WITHDRAWN, amount: 100000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: CARD_REPAID, amount: 50000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'}
   ]);
 
   t.end();
@@ -87,9 +87,9 @@ test("new card gets a new id", function (t) {
 });
 test("recreate card from events", function(t) {
   const events = [
-    {type: eventTypes.LIMIT_ASSIGNED, amount: 150000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
-    {type: eventTypes.CARD_WITHDRAWN, amount: 100000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
-    {type: eventTypes.CARD_REPAID, amount: 50000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'}
+    {type: LIMIT_ASSIGNED, amount: 150000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: CARD_WITHDRAWN, amount: 100000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: CARD_REPAID, amount: 50000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'}
   ];
   const c = recreateFrom('1234', events);
 
