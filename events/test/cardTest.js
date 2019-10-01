@@ -1,5 +1,6 @@
 const test = require('tape');
 const card = require('../src/card');
+const eventTypes = require("../src/eventTypes");
 
 test("cannot assign limit for the second time", function (t) {
   const c = card();
@@ -59,6 +60,20 @@ test("can repay a card", function (t) {
   c.repay(50000);
 
   t.equal(c.availableLimit(), 100000);
+
+  t.end();
+});
+test("can capture events", function (t) {
+  const c = card();
+  c.assignLimit(150000);
+  c.withdraw(100000);
+  c.repay(50000);
+
+  t.deepEqual(c.pendingEvents(), [
+    {type: eventTypes.LIMIT_ASSIGNED, amount: 150000},
+    {type: eventTypes.CARD_WITHDRAWN, amount: 100000},
+    {type: eventTypes.CARD_REPAID, amount: 50000}
+  ])
 
   t.end();
 });
