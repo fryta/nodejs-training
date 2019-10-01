@@ -1,4 +1,4 @@
 .idea
 node_modules
-node_books/node_modules
-node_books/.clinic
+*/node_modules
+*/.clinic
