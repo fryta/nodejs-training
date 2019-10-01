@@ -31,7 +31,17 @@ module.exports = ({bookRepository, bookService}) => (withErrorHandling({
 
     const book = await bookRepository.find({isbn});
 
-    return book ? res.json(book) : next();
+    return book ? res.format({
+      "text/html"() {
+        res.send("HTML");
+      },
+      "application/json"(){
+        res.json(book)
+      },
+      "default"() {
+
+      }
+    }) : next();
   },
   async remove(req, res, next){
     const isbn = req.params.isbn;

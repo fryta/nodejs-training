@@ -18,6 +18,7 @@ describe("Book inventory", function() {
 
     await request
       .get(createResult.header.location)
+      .set("Accept", "application/json")
       .expect(200, {
         title: "JavaScript in Action",
         authors: ["James Smith", "Kate Donovan"],
