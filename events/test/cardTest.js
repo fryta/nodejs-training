@@ -1,5 +1,6 @@
 const test = require('tape');
-const card = require('../src/card');
+function now() { return new Date('August 19, 2018 23:15:30 UTC'); }
+const card = require('../src/card')(now);
 const eventTypes = require("../src/eventTypes");
 
 test("cannot assign limit for the second time", function (t) {
@@ -64,16 +65,16 @@ test("can repay a card", function (t) {
   t.end();
 });
 test("can capture events", function (t) {
-  const c = card('123');
+  const c = card('1234');
   c.assignLimit(150000);
   c.withdraw(100000);
   c.repay(50000);
 
   t.deepEqual(c.pendingEvents(), [
-    {type: eventTypes.LIMIT_ASSIGNED, amount: 150000, card_id: "123"},
-    {type: eventTypes.CARD_WITHDRAWN, amount: 100000, card_id: "123"},
-    {type: eventTypes.CARD_REPAID, amount: 50000, card_id: "123"}
-  ])
+    {type: eventTypes.LIMIT_ASSIGNED, amount: 150000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: eventTypes.CARD_WITHDRAWN, amount: 100000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'},
+    {type: eventTypes.CARD_REPAID, amount: 50000, card_id: '1234', date: '2018-08-19T23:15:30.000Z'}
+  ]);
 
   t.end();
 });
