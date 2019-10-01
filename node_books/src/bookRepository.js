@@ -20,6 +20,13 @@ module.exports = {
 
     return await books.findOne({isbn}, {projection: {_id: false}});
   },
+  async findAll() {
+    const books = await booksPromise;
+
+    return await books
+      .find({}, {projection: {_id: false}})
+      .toArray();
+  },
   async remove({isbn}) {
     const books = await booksPromise;
 

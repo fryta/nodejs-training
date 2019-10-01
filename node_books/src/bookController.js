@@ -27,6 +27,13 @@ module.exports = ({bookRepository, bookService}) => (withErrorHandling({
 
     return responses.createOrUpdate({isbn: book.isbn}, res, next);
   },
+  async getList(req, res, next){
+    const books = await bookRepository.findAll();
+
+    const layout = req.query.nolayout == null ? "layout" : "";
+
+    responses.list({books, layout}, res, next);
+  },
   async details(req, res, next){
     const isbn = req.params.isbn;
 
