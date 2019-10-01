@@ -94,7 +94,8 @@ test("recreate card from events", function(t) {
   const c = recreateFrom('1234', events);
 
   t.deepEqual(c.uuid(), '1234');
-  t.equal(c.availableLimit(), 150000);
+  t.equal(c.availableLimit(), 100000
+  );
   t.deepEqual(c.pendingEvents(), []);
 
   t.end();

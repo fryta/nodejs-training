@@ -6,9 +6,25 @@ module.exports = function cardModule(now) {
     let cash = 0;
     let events = [];
 
+    const apply = (event) => {
+      if (event.type === eventTypes.LIMIT_ASSIGNED) {
+        limit = event.amount;
+        cash = event.amount;
+      }
+      if (event.type === eventTypes.CARD_WITHDRAWN) {
+        cash -= event.amount;
+      }
+      if (event.type === eventTypes.CARD_REPAID) {
+        cash += event.amount;
+      }
+    };
     const limitAlreadyAssigned = () => limit !== null;
     const notEnoughMoney = (amount) => cash < amount;
-    const storeEvent = (type, amount) => events.push({type, amount, card_id: cardIdentifier, date: now().toJSON()});
+    const storeAndApplyEvent = (type, amount) => {
+      const event = {type, amount, card_id: cardIdentifier, date: now().toJSON()};
+      apply(event);
+      events.push(event);
+    };
 
     return {
       assignLimit(amount) {
@@ -16,10 +32,7 @@ module.exports = function cardModule(now) {
           throw new Error("Cannot assign limit for the second time");
         }
 
-        limit = amount;
-        cash = amount;
-
-        storeEvent(eventTypes.LIMIT_ASSIGNED, amount);
+        storeAndApplyEvent(eventTypes.LIMIT_ASSIGNED, amount);
       },
       availableLimit() {
         return cash;
@@ -33,12 +46,10 @@ module.exports = function cardModule(now) {
           throw new Error("Not enough money");
         }
 
-        cash -= amount;
-        storeEvent(eventTypes.CARD_WITHDRAWN, amount);
+        storeAndApplyEvent(eventTypes.CARD_WITHDRAWN, amount);
       },
       repay(amount) {
-        cash += amount;
-        storeEvent(eventTypes.CARD_REPAID, amount);
+        storeAndApplyEvent(eventTypes.CARD_REPAID, amount);
       },
       pendingEvents(){
         return events;
@@ -46,18 +57,7 @@ module.exports = function cardModule(now) {
       uuid(){
         return cardIdentifier;
       },
-      apply(event) {
-
-        if (event.type === eventTypes.LIMIT_ASSIGNED) {
-          limit = event.amount;
-        }
-        if (event.type === eventTypes.CARD_WITHDRAWN) {
-          cash -= event.amount;
-        }
-        if (event.type === eventTypes.CARD_REPAID) {
-          cash += event.amount;
-        }
-      }
+      apply
     };
   }
 
