@@ -33,6 +33,10 @@ module.exports = async function() {
     };
   }
 
+  function handle(command) {
+    return withErrorHandling(withPersistence(command));
+  }
+
   app.use(express.json());
 
   app.get('/limit/:uuid', async function (req, res) {
@@ -40,17 +44,17 @@ module.exports = async function() {
     res.json({uuid: c.uuid(), limit: c.availableLimit()});
   });
 
-  app.post('/limit', withErrorHandling(withPersistence(function(card, body) {
+  app.post('/limit', handle((card, body) => {
     card.assignLimit(body.amount);
-  })));
+  }));
 
-  app.post('/withdrawal', withErrorHandling(withPersistence(function(card, body) {
+  app.post('/withdrawal', handle((card, body) => {
     card.withdraw(body.amount);
-  })));
+  }));
 
-  app.post('/repayment', withErrorHandling(withPersistence(function(card, body) {
+  app.post('/repayment', handle((card, body) => {
     card.repay(body.amount);
-  })));
+  }));
 
   app.close = function() {
     return es.close();
