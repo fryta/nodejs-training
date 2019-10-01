@@ -12,11 +12,18 @@ function initStore() {
       useNewUrlParser: true
     }
   });
+
+  es.close = function(){
+    es.store.db.close();
+  };
+
+  es.defineEventMappings({
+    id: 'event_id'
+  });
+
   return new Promise(function(resolve, reject) {
     es.init(function (err) {
       if(err) reject(err);
-
-      es.close = es.store.db.close;
 
       resolve(es);
     });
