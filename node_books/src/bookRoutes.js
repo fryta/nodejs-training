@@ -1,3 +1,5 @@
+const {BOOK, BOOK_COLLECTION} = require("./links").resources;
+
 module.exports = (db) => {
   const router = require('express').Router();
   const bookControllerFactory = require("./bookController");
@@ -7,10 +9,10 @@ module.exports = (db) => {
 
   const {details, createOrUpdate, remove, getList} = bookControllerFactory({bookService, bookRepository});
 
-  router.post("/book", validateBookMiddleware, createOrUpdate);
-  router.get("/book", getList);
-  router.get("/book/:isbn", details);
-  router.delete("/book/:isbn", remove);
+  router.post(BOOK, validateBookMiddleware, createOrUpdate);
+  router.get(BOOK, getList);
+  router.get(BOOK_COLLECTION, details);
+  router.delete(BOOK_COLLECTION, remove);
 
   return router;
 };

@@ -1,11 +1,13 @@
+const bookLink = require("./links").bookLink;
+
 module.exports = {
   createOrUpdate({isbn}, res, next){
-    return res.redirect(`/book/${isbn}`);
+    return res.redirect(bookLink(isbn));
   },
   list({books, layout}, res, next){
     return res.format({
       "text/html"() {
-        res.render("books", {books, layout});
+        res.render("books", {books: books.map(book => ({...book, link: bookLink(book.isbn)})), layout})
       },
       "application/json"() {
         res.json(books);
