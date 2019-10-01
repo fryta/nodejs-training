@@ -1,6 +1,7 @@
 const eventCreatorFactory = require("./eventCreator");
 const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
 const eventTrackerFactory = require("./eventTracker");
+const ClientError = require("./ClientError");
 
 module.exports = (now) => {
   const card = (cardIdentifier) => {
@@ -29,7 +30,7 @@ module.exports = (now) => {
       apply,
       assignLimit(amount) {
         if (limitAlreadyAssigned()) {
-          throw new Error("Cannot assign limit for the second time");
+          throw new ClientError("Cannot assign limit for the second time");
         }
 
         const event = eventCreator.limitAssigned(amount);
@@ -40,11 +41,11 @@ module.exports = (now) => {
       },
       withdraw(amount) {
         if (!limitAlreadyAssigned()) {
-          throw new Error("No limit assigned");
+          throw new ClientError("No limit assigned");
         }
 
         if(notEnoughMoney(amount)){
-          throw new Error("Not enough money");
+          throw new ClientError("Not enough money");
         }
 
         const event = eventCreator.cardWithdrawn(amount);
