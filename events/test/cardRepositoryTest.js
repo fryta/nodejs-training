@@ -1,6 +1,6 @@
 const test = require('tape');
 const cardFactory = require('../src/card');
-const cardRepository = require('../src/mongoCardRepository');
+const cardRepository = require('../src/cardRepository');
 const init = require('../src/es');
 function now() { return new Date('August 19, 2018 23:15:30 UTC'); }
 const {card, recreateFrom} = cardFactory(now);
