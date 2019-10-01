@@ -29,11 +29,13 @@ module.exports = ({bookRepository, bookService}) => (withErrorHandling({
   async details(req, res, next){
     const isbn = req.params.isbn;
 
+    const layout = req.query.nolayout == null ? "layout" : "";
+
     const book = await bookRepository.find({isbn});
 
     return book ? res.format({
       "text/html"() {
-        res.send("HTML");
+        res.render("book", {book, layout});
       },
       "application/json"(){
         res.json(book)
