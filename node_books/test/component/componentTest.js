@@ -26,13 +26,13 @@ describe("Book inventory", function() {
         description: "The ultimate JS book!",
         slug: "javascript-in-action"
       });
-    //
-    // await request
-    //   .delete(createResult.header.location)
-    //   .expect(204);
-    //
-    // await request
-    //   .get(createResult.header.location)
-    //   .expect(404);
+
+    await request
+      .delete(createResult.header.location)
+      .expect(204);
+
+    await request
+      .get(createResult.header.location)
+      .expect(404);
   });
 });

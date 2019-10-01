@@ -1,4 +1,5 @@
 const mapValues = require("lodash.mapvalues");
+const responses = require("./responses");
 
 const wrapWithTryCatch1 = fn =>
   (req, res, next) =>
@@ -24,7 +25,7 @@ module.exports = ({bookRepository, bookService}) => (withErrorHandling({
 
     await bookService.createOrUpdate(book);
 
-    return res.redirect(`/book/${book.isbn}`);
+    return responses.createOrUpdate({isbn: book.isbn}, res, next);
   },
   async details(req, res, next){
     const isbn = req.params.isbn;
@@ -33,23 +34,13 @@ module.exports = ({bookRepository, bookService}) => (withErrorHandling({
 
     const book = await bookRepository.find({isbn});
 
-    return book ? res.format({
-      "text/html"() {
-        res.render("book", {book, layout});
-      },
-      "application/json"(){
-        res.json(book)
-      },
-      "default"() {
-
-      }
-    }) : next();
+    return responses.details({book, layout}, res, next);
   },
   async remove(req, res, next){
     const isbn = req.params.isbn;
 
     await bookRepository.remove({isbn});
 
-    return res.status(204).end();
+    return responses.remove({isbn}, res, next);
   }
 }));
