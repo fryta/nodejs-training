@@ -1,13 +1,13 @@
 const eventTypes = require("./eventTypes");
 
-module.exports = function card() {
+module.exports = function card(cardIdentifier) {
   let limit = null;
   let cash = 0;
   let events = [];
 
   const limitAssigned = () => limit !== null;
   const notEnoughMoney = (amount) => cash < amount;
-  const storeEvent = (type, amount) => events.push({type, amount});
+  const storeEvent = (type, amount) => events.push({type, amount, card_id: cardIdentifier});
 
   return {
     assignLimit(amount) {
@@ -41,6 +41,9 @@ module.exports = function card() {
     },
     pendingEvents(){
       return events;
+    },
+    uuid(){
+      return cardIdentifier;
     }
   };
 };
