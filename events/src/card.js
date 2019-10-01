@@ -1,13 +1,12 @@
 const eventCreatorFactory = require("./eventCreator");
 const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
+const eventTrackerFactory = require("./eventTracker");
 
-module.exports = function cardModule(now) {
-  function card(cardIdentifier) {
+module.exports = (now) => {
+  const card = (cardIdentifier) => {
     let limit = null;
     let cash = 0;
-    let events = [];
 
-    const eventCreator = eventCreatorFactory(cardIdentifier, now);
     const apply = (event) => {
       if (event.type === LIMIT_ASSIGNED) {
         limit = event.amount;
@@ -22,19 +21,19 @@ module.exports = function cardModule(now) {
     };
     const limitAlreadyAssigned = () => limit !== null;
     const notEnoughMoney = (amount) => cash < amount;
-    const storeAndApplyEvent = (specificEventCreator, amount) => {
-      const event = specificEventCreator(amount);
-      apply(event);
-      events.push(event);
-    };
+    const eventCreator = eventCreatorFactory(cardIdentifier, now);
+    const {applyWithRecord, ...eventTracker} = eventTrackerFactory(apply);
 
     return {
+      ...eventTracker,
+      apply,
       assignLimit(amount) {
         if (limitAlreadyAssigned()) {
           throw new Error("Cannot assign limit for the second time");
         }
 
-        storeAndApplyEvent(eventCreator.limitAssigned, amount);
+        const event = eventCreator.limitAssigned(amount);
+        applyWithRecord(event);
       },
       availableLimit() {
         return cash;
@@ -48,22 +47,20 @@ module.exports = function cardModule(now) {
           throw new Error("Not enough money");
         }
 
-        storeAndApplyEvent(eventCreator.cardWithdrawn, amount);
+        const event = eventCreator.cardWithdrawn(amount);
+        applyWithRecord(event);
       },
       repay(amount) {
-        storeAndApplyEvent(eventCreator.cardRepaid, amount);
-      },
-      pendingEvents(){
-        return events;
+        const event = eventCreator.cardRepaid(amount);
+        applyWithRecord(event);
       },
       uuid(){
         return cardIdentifier;
-      },
-      apply
+      }
     };
   }
 
-  function recreateFrom(cardIdentifier, events){
+  const recreateFrom = (cardIdentifier, events) => {
     return events.reduce((card, event) => {
       card.apply(event);
       return card;

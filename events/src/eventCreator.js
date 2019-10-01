@@ -1,6 +1,6 @@
 const {LIMIT_ASSIGNED, CARD_WITHDRAWN, CARD_REPAID} = require("./eventTypes");
 
-module.exports = function cardEventsCreator(cardIdentifier, now) {
+module.exports = (cardIdentifier, now) => {
   return {
     limitAssigned(amount){
       return {type: LIMIT_ASSIGNED, amount, card_id: cardIdentifier, date: now().toJSON()};

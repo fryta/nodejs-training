@@ -100,3 +100,15 @@ test("recreate card from events", function(t) {
 
   t.end();
 });
+test("can flush events", function (t) {
+  const c = card('1234');
+  c.assignLimit(150000);
+  c.withdraw(100000);
+  c.repay(50000);
+
+  c.flushEvents();
+
+  t.deepEqual(c.pendingEvents(), []);
+
+  t.end();
+});
